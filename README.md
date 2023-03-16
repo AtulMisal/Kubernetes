@@ -1,14 +1,16 @@
 # Kubernetes
-This repo has information on kubernetes.
+# This repo has information on kubernetes.
 
 Kubernetes is also knows as k8s because there are 8 characters between k & s.
 k8s is an container orchastration an management tool.
+   "K8S is an open source system for automating deployment, scalling and managment of containerized application"
+    container management (orchestration) tool"
 
 Q) What is mean by Orchestration/Management tool?
   Container orchestration automates the deployment, management, scaling, and networking of containers across the cluster.
   As we know docker is used to create containers but to manage them we use k8s. 
   
-Kubernetes is a popular container orchestration tool similar to docker swarm, K8 is mostly used to manage the containers, it is also used for blue-green deployments,     also use to scale the containers.
+Kubernetes is a popular container orchestration tool similar to docker swarm, K8 is mostly used to manage the containers, it is also used for blue-green deployments,    also use to scale the containers.
 Written in Golang.
 
 # K8s architecture and overview --
