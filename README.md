@@ -3,8 +3,8 @@
 
 Kubernetes is also knows as k8s because there are 8 characters between k & s.
 k8s is an container orchastration an management tool.
-   "K8S is an open source system for automating deployment, scalling and managment of containerized application"
-    container management (orchestration) tool"
+   "K8S is an open source system for automating deployment, scalling and managment of containerized application".
+    Also called asccontainer management (orchestration) tool"
 
 Q) What is mean by Orchestration/Management tool?
   Container orchestration automates the deployment, management, scaling, and networking of containers across the cluster.
