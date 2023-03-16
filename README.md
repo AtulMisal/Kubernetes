@@ -10,7 +10,7 @@ Q) What is mean by Orchestration/Management tool?
   Container orchestration automates the deployment, management, scaling, and networking of containers across the cluster.
   As we know docker is used to create containers but to manage them we use k8s. 
   
-Kubernetes is a popular container orchestration tool similar to docker swarm, K8 is mostly used to manage the containers, it is also used for blue-green deployments,    also use to scale the containers.
+Kubernetes is a popular container orchestration tool similar to docker swarm, K8 is mostly used to manage the containers, it is also used for blue-green deployments, also use to scale the containers.
 Written in Golang.
 
 # K8s architecture and overview --
