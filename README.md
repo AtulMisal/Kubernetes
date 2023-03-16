@@ -15,7 +15,7 @@ Kubernetes is a popular container orchestration tool similar to docker swarm, K8
 Written in Golang.
 
 # K8s architecture and overview --
-  K8 nodes are divided into 2 types, master node(control plane), and worker node.
+  K8 cluster is divided into 2 types, master node(control plane), and worker node.
   These nodes can be a physical machines as well as the virtual machines.
   Master and Worker nodes have different components resided inside it.
      
