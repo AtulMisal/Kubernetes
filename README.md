@@ -27,15 +27,15 @@ Written in Golang.
      It has four components: ETCD, Scheduler, Controller and API Server 
   
   2. Master Node Component --
-      1. API Server      -->
-      2. ETCD            -->
-      3. Control Manager -->
-      4. Scheduler       -->
+      1. API Server      --> It is the main part of master mode to which end user will connect the requirement from end user will be given to api server.
+      2. ETCD            --> This is a one type of database which has key-pair value the data of APS server is stored in this.
+      3. Control Manager --> It will make sure that the actual state of cluster matches to the desired state so it will control the number of nodes or pods.
+      4. Scheduler       --> It will check that if new pod is present then it will assign to a new node, also create manages and deletes the pod.
   
   3. Worker Node --
-       1. Kubelet        -->
-       2. kube-proxy     -->
-       3. Runtime        -->
+       1. Kubelet        --> One of the most important part of worker node which is connected to api server it also creates and manages pods also sends                                    success or failuer reports to master.
+       2. kube-proxy     --> Assigns IP to pods it runs on each pod and this means that each part will get unique IP.
+       3. Runtime        --> Works with kubelet here we use the c engine because kubernetes will also go with other contenerization tools like container d,                                rocket. It is used for pulling images start and stops container.
        
        
        
