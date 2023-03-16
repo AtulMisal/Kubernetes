@@ -1,0 +1,49 @@
+First we have to swap off from k8s cluster.
+ To check this use -- free -h   it will show the status.
+ Now we have to empty this swap so use -- swapoff -a Perform this step in all nodes including master node.
+ But whenever we restart our system it will again come to avoid this change some setting in fstab as
+    
+    vi /etc/fstab  --> disable all lines that contains swap word in all nodes.
+    
+ As k8s will run containers at backend so we need docker.
+ So install docker on all nodes.
+    
+    apt install docker.io
+
+ When we use k8s we want to use some tools like kops, kubeadm. In this case we will use kubeadm.
+ 1.Update the apt package index and install packages needed to use the Kubernetes apt repository:
+    
+    sudo apt-get update
+     sudo apt-get install -y apt-transport-https ca-certificates curl
+ 
+ 2.Download the Google Cloud public signing key:
+    
+    sudo curl -fsSLo /etc/apt/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+
+ 3.Add the Kubernetes apt repository:
+    
+    echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+
+ 4.Update apt package index, install kubelet, kubeadm and kubectl, and pin their version:
+     
+     sudo apt-get update
+     sudo apt-get install -y kubelet kubeadm kubectl
+     sudo apt-mark hold kubelet kubeadm kubectl
+	 
+ kubeadm: the command to bootstrap the cluster.
+
+ kubelet: the component that runs on all of the machines in your cluster and does things like starting pods and containers.
+
+ kubectl: the command line util to talk to your cluster.	
+
+Now we have to give some port mapping as our k8s cluster will consists of web and db server to do this -
+  ------------------------ See pdf class -----------------------
+
+------------
+
+ When we hit the flannel ip range with -- kubeadm init --pod-network-cidr  --- take this from documentation.
+ By this we will get some commands to be run on master node copy that and run.
+ 
+ Now master is ready its time to connect worker nodes to it.
+ We also have one kubeadm join command in above step copy that and paste on the worker nodes that you want to add in this cluster.
+ Now our whole cluster is ready.
