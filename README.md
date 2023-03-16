@@ -39,12 +39,14 @@ Written in Golang.
        
        
        
-![AWS Internal certification](https://user-images.githubusercontent.com/108976232/224984901-d3a4e797-92e7-473f-a06c-0b22df6f74b6.png)
+![Intro_K8s_architecture-d4fd537f533d01c98802e9c01f858eca](https://user-images.githubusercontent.com/108976232/225552949-d255c3f7-824a-4233-9446-22519fddbeec.png)
+
+
 
 
        
        
-       
+      
        
        
   
