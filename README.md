@@ -7,6 +7,7 @@ k8s is an container orchastration an management tool.
     Also called asccontainer management (orchestration) tool"
 
 Q) What is mean by Orchestration/Management tool?
+
   Container orchestration automates the deployment, management, scaling, and networking of containers across the cluster.
   As we know docker is used to create containers but to manage them we use k8s. 
   
