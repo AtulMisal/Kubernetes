@@ -29,7 +29,7 @@ Written in Golang.
   
   2. Master Node Component --
       1. API Server      --> It is the main part of master mode to which end user will connect the requirement from end user will be given to api server.
-      2. ETCD            --> This is a one type of database which has key-pair value the data of APS server is stored in this.
+      2. ETCD            --> This is a one type of database which has key-pair value the data of API server is stored in this.
       3. Control Manager --> It will make sure that the actual state of cluster matches to the desired state so it will control the number of nodes or pods.
       4. Scheduler       --> It will check that if new pod is present then it will assign to a new node, also create manages and deletes the pod.
   
