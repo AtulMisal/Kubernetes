@@ -1,0 +1,128 @@
+Hello connections,
+   Today we will see some imp concepts of Kubernetes.
+   
+ 1) What is Kubernetes & why it is used?
+      Kubernetes is an open source system which is used to automate deployments, Scaling, Managing containerized applications.
+      In simple words it is an container management & orchestration tool. There are various products in market like Docker Swarm, Apache Mesos,
+      OKD, but K8S is an populer and currently tranding in market.
+
+      It is used to manage the containerized application cluster.
+
+ 2)	Architecture of K8S --
+       K8 cluster is divided into 2 types, master node(control plane), and worker node. These nodes can be a physical machines as well as the virtual machines. 
+	   Master and Worker nodes have different components resided inside it.
+	   A cluster is a set of machines, called nodes.
+
+    1) Master Node -- Master is responsible for managing the complete cluster. You can access master node via the CLI, GUI, or API. 
+	   The master watches over the nodes in the cluster and is responsible for the actual orchestration of containers on the worker nodes. 
+	   For achieving fault tolerance, there can be more than one master node in the cluster. 
+	   It is the access point from which administrators and other users interact with the cluster to manage the scheduling and deployment of containers. 
+	   It has four components: ETCD, Scheduler, Controller and API Server
+
+       Master Node Component --
+
+       a) API Server --> It is the main part of master mode to which end user will connect the requirement from end user will be given to api server.
+       b) ETCD       --> This is a one type of database which has key-pair value the data of API server is stored in this.
+       c) Control Manager --> It will make sure that the actual state of cluster matches to the desired state so it will control the number of nodes or pods.
+       d) Scheduler  --> It will check that if new pod is present then it will assign to a new node, also create manages and deletes the pod.
+       
+	2) Worker Node -- These are the nodes on which the pods will be scheduled.
+
+       a) Kubelet    --> One of the most important part of worker node which is connected to api server it also creates and manages pods also sends success or failuer reports to master.
+       b) kube-proxy --> Assigns IP to pods it runs on each pod and this means that each part will get unique IP.
+       c) Runtime    --> Works with kubelet here we use the c engine because kubernetes will also go with other contenerization tools like container d, rocket. 
+	                     It is used for pulling images start and stops container. 
+						 
+						 
+    Other imp concepts :-
+        1) kubeadm: the command to bootstrap the cluster.
+        2) kubelet: the component that runs on all of the machines in your cluster and does things like starting pods and containers.
+        3) kubectl: the command line util to talk to your cluster.	
+	
+	Additional Info. :-
+        In a Cluster Kubernetes supports:
+            No more than 5000 nodes
+			No more than 150000 total pods
+			No more than 300000 total containers
+			No more than 100 pods per node	
+			
+		Automated rollouts and rollbacks
+            Rollout: deploy changes to the application or its configuration
+            Rollback: revert the changes & restore to the previous state
+            Kubernetes ensures there is no downtime during this process
+	
+		Secret & configuration management
+            Kubernetes manages secrets and configuration details for an application separately from the container image,
+            Deploy and update secrets and application configuration without rebuilding your image and without exposing secrets in your stack configuration.
+
+    With the help of K8S will tell our cluster that we need this much of replicas of our image (Application Image). So K8S will do the following things -
+		If a container fails - restarts container
+		If node dies - replaces and reschedule containers on other nodes
+		If container does not respond to user defined health check - kills container
+		This is taken care by Kubernetes  ReplicationController		
+		
+Now we will see some commands that are used in K8S --
+
+   For this we have to write a yaml file and it consists of various fields.
+   By following command we will see all parameters that has to be taken into yaml file.
+        kubectl explain resource_name --recursive | less
+	
+
+ Here are some important commands for Newbies that are commonly used in Kubernetes: 📢
+
+    ➡ kubectl create: This command is used to create a new Kubernetes object, such as a deployment, service, or pod.
+            kubectl create resource resource_name		
+
+    ➡ kubectl apply: This command is used to apply changes to an existing Kubernetes object, such as updating a deployment.
+             kubectl create pod pod_name
+
+    ➡ kubectl get: This command is used to retrieve information about Kubernetes objects, such as pods, services, or deployments.
+			  kubectl get pods / nodes / services / deployments / namespace   
+
+    ➡ kubectl describe: This command is used to get more detailed information about a Kubernetes object, such as its configuration, status, and events.
+			  kubectl describe pod pod_name
+
+    ➡ kubectl logs: This command is used to retrieve the logs from a container running inside a pod.
+              kubectl logs deployment/<name-of-deployment> # logs of deployment
+			  kubectl logs -f deployment/<name-of-deployment> # follow logs
+
+    ➡ kubectl exec: This command is used to execute a command inside a container running in a pod.
+              kubectl exec pod_name -c container_name  -it bash  -- If has multiple containers.     
+
+    ➡ kubectl delete: This command is used to delete a Kubernetes object, such as a deployment or pod.
+               kubectl delete pod pod_name
+
+    ➡ kubectl scale: This command is used to scale the number of replicas in a deployment or statefulset.
+              kubectl scale replicaset --replicas=5 replicaset_name
+
+    ➡ kubectl rollout: This command is used to manage rolling updates of deployments.
+              kubectl rollout status deployment deployment_name
+ 
+    ➡ kubectl port-forward: This command is used to forward a local port to a port on a pod.
+               kubectl expose pod pod_name --type=NodePort --port=80 --target-port=8000 --name=myservice    -- A service will be created
+
+Mostly used commands in K8S :-
+
+   1) kubectl run --generator=run-pod/v1 --image=nginx   -- Used only for Practice(Development purpose)
+   2) kubectl describe pod podname
+   3) kubectl apply -f pod.yml                           -- yaml file name
+   4) kubectl edit pod podname
+   5) kubectl diff -f pod.yml
+   6) kubectl exec podname -c container_name -it env     -- if you want to see anything of inside container use this instead of env use that.
+   7) kubectl exec podname -c container_name -it bash
+   9) kubectl label pod podname env-                     -- will delete labels to pod
+  10) kubectl label pod --overwrite podname env=Prod1    -- Will over-write the label 
+      kubectl get pods --show-labels                     -- will show all labels      
+  11) kubectl delete pod podname                         -- Will delete the pod
+  12) kubectl delete -f pod.yml                          -- Will delete all resources that are created by this file.
+  13) kubectl expose pod podname --port=8000 --target-port=80 --name=myfirstservice                   -- It will open port 8000 
+  14) kubectl expose pod podname --type=NodePort --port=8000 --target-port=80 --name=myfirstservice1  -- It will open port on web to check port use follo command
+  15) kubectl get svc                                                                                 -- By this we will get services that we created along with ports
+  16) kubectl delete rc --cascase=false rc_name                                                       -- It will deleteonly rc not the pods that is created by this rc.
+  17) kubectl scale rc --replicas=12 rc_name                                                          -- It will increase no of pods.
+  18) kubectl explain pod --recursive | less
+
+
+
+
+
