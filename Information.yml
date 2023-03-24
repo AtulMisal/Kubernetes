@@ -121,5 +121,3 @@ Mostly used commands in K8S :-
   16) kubectl delete rc --cascase=false rc_name                                                       -- It will deleteonly rc not the pods that is created by this rc.
   17) kubectl scale rc --replicas=12 rc_name                                                          -- It will increase no of pods.
   18) kubectl explain pod --recursive | less
-
-
