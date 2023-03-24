@@ -56,4 +56,7 @@ Written in Golang.
       
        
        
+ ![K8S Commands](https://user-images.githubusercontent.com/108976232/227513327-239b8d65-7ebf-41ba-9ce3-b6b0d4b274cd.png)
+      
+       
   
