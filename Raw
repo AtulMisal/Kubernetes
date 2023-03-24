@@ -195,3 +195,35 @@ Now we have to give some port mapping as our k8s cluster will consists of web an
 
 K8S Architecture -
   
+  
+  
+  
+  
+  
+  
+  Here are some important commands for Newbies that are commonly used in Kubernetes: 📢
+
+➡ kubectl create: This command is used to create a new Kubernetes object, such as a deployment, service, or pod.
+
+➡ kubectl apply: This command is used to apply changes to an existing Kubernetes object, such as updating a deployment.
+
+➡ kubectl get: This command is used to retrieve information about Kubernetes objects, such as pods, services, or deployments.
+
+➡ kubectl describe: This command is used to get more detailed information about a Kubernetes object, such as its configuration, status, and events.
+
+➡ kubectl logs: This command is used to retrieve the logs from a container running inside a pod.
+
+➡ kubectl exec: This command is used to execute a command inside a container running in a pod.
+
+➡ kubectl delete: This command is used to delete a Kubernetes object, such as a deployment or pod.
+
+➡ kubectl scale: This command is used to scale the number of replicas in a deployment or statefulset.
+
+➡ kubectl rollout: This command is used to manage rolling updates of deployments.
+
+➡ kubectl port-forward: This command is used to forward a local port to a port on a pod.
+
+➡ kubectl proxy: This command is used to create a proxy server that allows you to access the Kubernetes API server.
+
+➡ kubectl config: This command is used to manage Kubernetes configuration files.
+
