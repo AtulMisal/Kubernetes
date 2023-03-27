@@ -1,0 +1,123 @@
+ConfigMap :-
+  In Kubernetes, Configmap is an API object which is mainly used to store non-confidential data. 
+  The data that is stored in ConfigMap is stored as key-value pairs. 
+  ConfigMaps are configuration files that may be used by pods as command-line arguments, environment variables, or even as configuration files on a disc. 
+  This feature allows us to decouple environment-specific configuration from our container images, after this is done our applications are easily portable. 
+  ConfigMaps are not encrypted in any way, and all data they contain is visible to anyone who can access the file. 
+  You can use Kubernetes secrets to store sensitive information. 
+
+ConfigMap can be created by multiple methods that is by command line and through yaml file.
+We can created ConfigMap by following -
+   1. kubectl create cm cm_name --from-literal=Name="Atul" --from-literal=ID="123"     
+   2. kubectl create cm cm_name --from-file=app.properties  -- Create one file and put all data in that file which you want to inject into pod.
+   3. kubectl create cm cm_name --from-file= /directory     -- Create files that you want & store it in one directory and provide that path.
+   4. kubectl create cm cm_name --from-env-file=env.sh      -- If you want to inject values as environment variable use this.
+  
+Now we will create ConfigMap from yaml file as -
+   A ConfigMap is a dictionary consisting of non-confidential data. Its primary role is to keep the configuration separate from the container image. 
+   ConfigMap can be created in different ways. This article will cover the declarative approach to creating ConfigMap from the YAML file.
+
+---------------------------------------------------------------------------------------------------------------------------------------------------
+1. Directly providing values in key pair format.   
+cm.yml
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: firstcm
+data:
+  key1: value1
+  key2: value2  
+ 
+ ---------------------------------------------------------------------------------------------------------------------------------------------------------
+2. Using file.
+cm1.yml
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: firstcm1
+data:
+  key1: |
+    value1
+	value2
+  key2: |
+    value3
+    value4
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+Now we will inject these ConfigMap into pods.
+ 1. Single values
+pod.yml
+
+apiVersion: v1
+kind: Pod
+metadata:
+     name: firstpod
+     labels:
+       app: myapp
+       type: frontend
+
+spec:
+   containers:
+     - name: firstcontainer
+       image: nginx
+       env:
+         - name: configmap1
+           valueFrom: 
+	         configMapKeyRef:
+				key: key_from_cm_file    -- Which key you want to inject.
+				name: cm_name
+				
+		 - name: configmap2
+           valueFrom: 
+	         configMapKeyRef:
+				key: key_fr'om_cm_file    -- Which key you want to inject.
+				name: cm_name		
+				
+ ---------------------------------------------------------------------------------------------------------------------------------------------------------			
+ 2. Injecting values from a file.
+ 
+pod.yml
+
+apiVersion: v1
+kind: Pod
+metadata:
+     name: firstpod
+     labels:
+       app: myapp
+       type: frontend
+
+spec:
+   containers:
+     - name: firstcontainer
+       image: nginx
+       envFrom:
+         - configMapRef:
+             name:	cm_name       -- All vaules will be injected	 
+			 
+---------------------------------------------------------------------------------------------------------------------------------------------------------			 
+ 2. Injecting values as a file.
+ 
+pod.yml
+
+apiVersion: v1
+kind: Pod
+metadata:
+     name: firstpod
+     labels:
+       app: myapp
+       type: frontend
+
+spec:
+   containers:
+     - name: firstcontainer
+       image: nginx
+       volumeMounts:
+	      - name: test
+		    mountPath: "/ConfigMapPath"  -- Give path where you want to store.
+			readOnly:
+	volumes:
+      - name: test      -- Give any name.
+       	configMap:
+          name: cm_name		
