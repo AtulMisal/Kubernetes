@@ -1,0 +1,42 @@
+Taint & Toleration
+
+  Taint - It will act as a filter on nodes. Suppose we have to assign a pods to specific worker nodes then we will add taint on them.      
+	  kubectl taint node node_name size=large:NoSchedule
+
+  To remove a taint -
+      kubectl taint node node_name size-
+	  
+	      Here with help of NoSchedule will tell to the cluster that if the pod not have this tolerance then it will not schedule on that node.
+		    We have 3 different typese as -
+		      1. NoSchedule        -- With this the pod will not schedule on node if he don't have tolerance.
+			    2. PreferNoSchedule  -- May or may not be scheduled.
+			    3. NoExecute         -- It will not scheduled but if other pods are running on that node it will delete that all pods.
+		  
+  Toleration - It will be given to pods so that it can tolerate that node.
+    Operator -
+            1. Equal -- It will check the value and key if matches will assign the pod to that node.
+		      	2. Exists - It will only check the key if key is present it will assign the pod. It will not check the value only key will be checked.
+  
+-------------------------------------------------------------------------------   
+vi pod.yml
+
+apiVersion: v1
+kind: Pod
+metadata:
+     name: firstpod
+     labels:
+       app: myapp
+       type: frontend
+
+spec:
+   containers:
+     - name: firstcontainer
+       image: nginx	
+   tolerations:
+      - effect: NoSchedule/PreferNoSchedule/NoExecute  -- Take that you need
+        key: size
+		operator: Equal/Exists
+		value: large
+		
+ # Example: kubectl taint node node_name size=large:NoSchedule	
+	
