@@ -1,0 +1,181 @@
+K8S Volume --
+
+ Q) What is a Kubernetes volume?
+     A Kubernetes volume is a directory containing data accessible to containers in a given pod, the smallest deployable unit in a Kubernetes cluster. 
+     Within the Kubernetes container orchestration and management platform, volumes provide a plugin mechanism that connects ephemeral containers with persistent data storage.
+     A Kubernetes volume persists until its associated pod is deleted. When a pod with a unique identification is deleted, the volume associated with it is destroyed. 
+     If a pod is deleted but replaced with an identical pod, a new and identical volume is also created.
+	 
+ Q)	What is a Kubernetes volume used for?
+      In Kubernetes, a node is a logical grouping of IT resources used to run container workloads. 
+	  Kubernetes mounts the volumes associated with a given pod to the node that pod is running on. 
+	  Volumes enable containers to move across infrastructure without losing access to the externally 
+	  hosted data that they require for the workload. 
+
+
+    Types of Kubernetes volumes
+       Kubernetes supports many types of volumes:
+		1. EmptyDir. A common type of volume created when a pod is first assigned to a node that allows users to mount multiple paths in each container. 
+		   The volume is initially empty, with all containers in the pod able to read from it.
+		2. HostPath. Another common type of volume that mounts a directory from the host node's file system into a pod.
+		3. Local volumes. These represent mounted local storage devices such as partitions, directories or disks.
+		4. Specialty volumes. These are used to mount platform-specific volumes into a pod. Examples include AzureFileVolume and 
+		   AzureDiskVolume for Microsoft Azure and VsphereVolume for VMware vSphere.
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+1. EmptyDir - Basically inside pod & outside of container - when pod deleted volume will also delete.
+pod.yml
+
+apiVersion: v1
+kind: Pod
+metadata:
+     name: firstpod
+     labels:
+       app: myapp
+       type: frontend
+
+spec:
+   containers:
+     - name: firstcontainer
+       image: nginx
+       volumeMounts:
+	      - name: test
+		    mountPath: /data  -- Give path where you want to store.
+			
+	volumes:
+      - name: test      -- Give any name.
+       	emptyDir: {}
+		
+------------------------------------------------------------------------------------------------------------------------------------------------		
+
+2. HostPath - On worker node. So if pod deleted the volume will not be deleted. (K8S will not allow us to use this. As if we provide volume on 1 node and after deletion the new pod will may schedule on other nodes.)
+pod.yml
+
+apiVersion: v1
+kind: Pod
+metadata:
+     name: firstpod
+     labels:
+       app: myapp
+       type: frontend
+
+spec:
+   containers:
+     - name: firstcontainer
+       image: nginx
+       volumeMounts:
+	      - name: test
+		    mountPath: /data  -- Give path where you want to store.
+			
+	volumes:
+      - name: test      -- Give any name.
+       	hostPath:
+		  path: tmp/data
+				
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+      In K8s we have different types of volumes which supports the different cloud providers.
+	    To see the volume types use -
+		   kubectl explain pod pod_name --recursive|less  --> In spec-containers-volumes
+		   
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  Persistent Volume and Persistent Claims -
+     Kubernetes Persistent Volume and Persistent claims help you to retain the data of the pod even after the end of the pod life cycle.
+
+  Q) What problems does it solve?
+       Containers running inside the pod can not share the files with each other.
+       All the files inside the container are temporary which means if you terminate the container you are going to lose all your files.
+	   Secondly if in any case, your container crashes then there is no way to recover files.
+       Kuberenetes provides volume plugin as Persistent Volume to address the above problems.
+       The lifecycle of these volumes are independent of the lifecycle of pods.
+       So if PODs are terminated then volumes are unmounted and detached keeping the data intact.
+
+  Q) What is Persistent Volume(PV)?
+      In simple terms, it's storage available within your Kubernetes cluster. This storage can be provisioned by you or Kubernetes administrator.
+      It's basically a directory with some data in it and all the containers running inside the pods can access it. But Persistent Volumes are independent of the POD life cycle.
+      So if PODs live or die, persistent volume does get affected and it can be reused by some other PODs.	
+
+vi persistent_volume.yml
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: firstpv
+spec:
+  capacity:
+    storage: 1Gi
+  volumeMode: Filesystem
+  accessModes:
+  - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-storage
+  local:
+    path:         -- Provide a path of your local system
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - node1	  
+		  
+-----------------------------------------------------------------------------------------------------
+
+   Q) What is Persistent Volume claim?
+        Persistent volume provides you an abstraction between the consumption of the storage and implementation of the storage.	
+   
+   Q) How to use Persistent Volume claim(PVC) ?
+        If you as an application developer wants to use/access Persistent Volume(PV) then you must create a request for storage and it can be done by creating PVC objects.		
+		
+vi persistent_claim.yml
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: first-pvc
+spec:
+  volumeName: firstpv
+  storageClassName: local-storage
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi		
+	  
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+   Will apply this PVC to pod as -
+   
+vi pod.yml
+   
+apiVersion: v1
+kind: Pod
+metadata:
+  name: first-pod-with-pvc
+  labels:
+    name: first-pod-with-pvc
+spec:
+  containers:
+  - name: pod-with-pvc
+    image: nginx:latest
+    ports:
+      - containerPort: 8080
+        name: www
+    volumeMounts:
+      - name: www-persistent-storage
+        mountPath:                   -- Provide a path of your local system
+  volumes:
+    - name: www-persistent-storage
+      persistentVolumeClaim:
+        claimName: first-pvc	  
+	  
+------------------------------------------------------------------------------------------------------------------------------------------------------------------	  
+
+   To delete this persistent volume first delete persistentVolumeClaim and then delete persistent volume.
+   
+   1. kubectl delete pvc first-pvc
+   2. kubectl delete pv firstpv
