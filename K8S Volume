@@ -41,7 +41,7 @@ spec:
        image: nginx
        volumeMounts:
 	      - name: test
-		    mountPath: /data  -- Give path where you want to store.
+		mountPath: /data  -- Give path where you want to store.
 			
 	volumes:
       - name: test      -- Give any name.
@@ -66,18 +66,18 @@ spec:
        image: nginx
        volumeMounts:
 	      - name: test
-		    mountPath: /data  -- Give path where you want to store.
+	        mountPath: /data  -- Give path where you want to store.
 			
 	volumes:
       - name: test      -- Give any name.
        	hostPath:
-		  path: tmp/data
+          path: tmp/data
 				
 ---------------------------------------------------------------------------------------------------------------------------------------------------------
 
       In K8s we have different types of volumes which supports the different cloud providers.
-	    To see the volume types use -
-		   kubectl explain pod pod_name --recursive|less  --> In spec-containers-volumes
+      To see the volume types use -
+         kubectl explain pod pod_name --recursive|less  --> In spec-containers-volumes
 		   
 ---------------------------------------------------------------------------------------------------------------------------------------------------------
 
