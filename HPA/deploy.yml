@@ -1,0 +1,31 @@
+# First Install one matrix server then we can use this HPA.
+# Matrix file is saved by name componantes.yml name
+# Then deploy this deploy file and use one command to create HPA
+
+# kubectle autoscale deployment deploy.yml
+
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+   name: mydeploy
+spec:
+   replicas: 1
+   selector:
+    matchLabels:
+     name: deployment
+   template:
+     metadata:
+       name: testpod8
+       labels:
+         name: deployment
+     spec:
+      containers:
+        - name: c00
+          image: httpd
+          ports:
+          - containerPort: 80
+          resources:
+            limits:
+              cpu: 500m
+            requests:
+              cpu: 200m
