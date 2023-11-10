@@ -15,13 +15,13 @@ ServiceAccounts :
     For Authorization will create RABC (Role & RoleBindings)
 	
 	Steps:
-	  1. kubectl create sa mysa      --> ServiceAccount as sa
-      2. kubectl get sa 
-      3. kubectl create token mysa 
-      4. Create Role.yml & Cluser RoleBinding.yml file & apply it
-      5. Create an Pod.yml add add ServiceAccountName field in manifest file. Apply it.
-      6. kubectl auth can-i get pod --as=system:serviceaccount:default:mysa  
-         It will show that the sa has all permission or not which was given by Role & Cluser RoleBinding.
+           1. kubectl create sa mysa      --> ServiceAccount as sa
+           2. kubectl get sa 
+           3. kubectl create token mysa 
+           4. Create Role.yml & Cluser RoleBinding.yml file & apply it
+           5. Create an Pod.yml add add ServiceAccountName field in manifest file. Apply it.
+           6. kubectl auth can-i get pod --as=system:serviceaccount:default:mysa  
+              It will show that the sa has all permission or not which was given by Role & Cluser RoleBinding.
 
 
 Service Account in Kubernetes Practical Guide:
