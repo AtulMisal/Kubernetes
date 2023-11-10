@@ -1,8 +1,10 @@
-# First Install one matrix server then we can use this HPA.
-# Matrix file is saved by name componantes.yml name
-# Then deploy this deploy file and use one command to create HPA
-
-# kubectle autoscale deployment deploy.yml
+	1. First you need to install one metrics server which will fetch the required data.
+	      wget -O metricserver.yml https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+   2. By this a yaml file will be downloaded apply this file an in kube-system namespace a pod will get created.
+	3. Then create one deployment file as given in github file.
+	4. Then apply one command as follows 
+	      kubectl autoscale deployment mydeploy --cpu-percent=20 --min=1 --max=10
+   5. By this command an HPA will be created with given specification.
 
 kind: Deployment
 apiVersion: apps/v1
