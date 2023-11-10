@@ -12,14 +12,14 @@ Deployment VS Statefulset :
     With help of deployment we can deploy our application on web/server. Which also creates it's replicas but for this application if users wants to upload some data then that data should be stored in the application with help of database. As we have multiple replicas of app so if we install database using deployment then there should be 
     Some consiquences as :
        Consider 3 replicas of app & database are running		   
-		      1. Now app wants to store some data so with help of service it can be stored on DB-2
+	  1. Now app wants to store some data so with help of service it can be stored on DB-2
           2. Now app wants to access that data so service randomly sends requests to any DB in deployment by this 
-			       case if request goes to DB-1 or DB-3 then that data is old one.
+	     case if request goes to DB-1 or DB-3 then that data is old one.
         
-	  With deployment the DB are not schcronized so data in DB are diff according to wrie operations performed by app. 
+    With deployment the DB are not schcronized so data in DB are diff according to wrie operations performed by app. 
     To overcome this issue in k8s we use statefulsets for stateful applications.		 
 		 
-		With statefulset we also create replicas of our application/stateful app. But here while creating the replicas a 
+    With statefulset we also create replicas of our application/stateful app. But here while creating the replicas a 
     unique name is given to each pod by statefulset. If the pod gets delete then also the same name is given to new pod.
     Here one pod becomes centeral pod on which we perform read/write application and other pods are senchronised with it so once read/write operations are done other pods get senchronised from it.
 
