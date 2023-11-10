@@ -1,3 +1,29 @@
+ServiceAccounts :
+     There are two users in K8s 
+	   1. Normal User
+	   2. ServiceAccounts  
+	   
+	ServiceAccounts are comes in picture when an other application wants to connect the cluster for any resource creation
+	or data retrival.
+	Example : An monitoring app will connect to cluster for retrival of metrics data.
+	Before this the request comes to API_Server it will check for Authentication and then performs the action.
+	
+	For Authentication of that specific application we will create an ServiceAccount.
+	For password we use Token to get this describe the pod and see in mounts section.
+	For that app serviceaccount acts as username and for pass we use token.
+
+    For Authorization will create RABC (Role & RoleBindings)
+	
+	Steps:
+	  1. kubectl create sa mysa      --> ServiceAccount as sa
+      2. kubectl get sa 
+      3. kubectl create token mysa 
+      4. Create Role.yml & Cluser RoleBinding.yml file & apply it
+      5. Create an Pod.yml add add ServiceAccountName field in manifest file. Apply it.
+      6. kubectl auth can-i get pod --as=system:serviceaccount:default:mysa  
+         It will show that the sa has all permission or not which was given by Role & Cluser RoleBinding.
+
+
 Service Account in Kubernetes Practical Guide:
     Service Accounts in Kubernetes allow you to authenticate and authorize applications and services running within a cluster. 
     They provide a way to grant specific permissions and access control to pods and containers.
