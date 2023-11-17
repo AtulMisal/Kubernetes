@@ -1,1 +1,43 @@
 
+Steps :
+	  1. Deploy the ingress controller that you want (We used Nginx Controller)
+	  2. kubectl get ns   --> An ingress-nginx namespace will be created 
+	  3. kubectl get all -n ingress-nginx   --> All pods under this will be shown
+	  4. Create the deployment with given docker images (Replicas should be based on condition)
+	  5. Create the services for above deployments with given ports.
+	  6. Create an ingress yml file with all data & apply it.
+	  7. Now describe the ingress controller and see the domains.
+	  8. Open browser and check wether the sits are running or not.
+	  9. Here the protocol is HTTP which is not secure to use HTTPS we need to use SSL Termination.
+
+------------------------------------------------------------------------------------------------------------------------------------
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata: 
+   name: my-ingress
+   labels:
+     name: my-ingress
+spec:
+  rules:
+    - host: "Example.devopspro.in"  # Your host name
+      http:
+        paths:
+          - backend:
+              service: 
+                name: service
+                port: 
+                  number: 8080      # Port number on which service is running
+            path: /  
+            pathType: Prefix   # See Documentation      
+    
+    - host: "Example.devopspro.in"  # Your host name
+      http:
+        paths:
+          - backend:
+              service:
+                name: service1
+                port:
+                  number: 8080     # Port number on which service is running
+            path: /apps            # Add the paths on which page you want to go  
+            pathType: Prefix   # See Documentation      
