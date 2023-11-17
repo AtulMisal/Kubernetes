@@ -1,3 +1,17 @@
+
+SSL Termination :
+      1. To run our website on secure side (HTTPS) we need some certificate & to get that we use SSL Termination.
+      2. Need to install a cert-manager
+      3. kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.7.1/cert-manager.yaml
+      4. A namespace should be created cert-manager.
+      5. To create an ssl certificate we have to create issuers & clusterissuers for staging and prod.
+      6. Issuers & ClusterIssuers are the K8S resources that represents certificate autorities that are able to 
+	        generate signed certificates.	
+      7. Create the yml files as in github repo for staging & prod add necessory annotations.
+      8. Edit the ingress file according to condition and check on browser the site will run on HTTPS protocol.
+
+-------------------------------------------------------------------------------------------------------------------------------------
+
 # staging_issuer.yml
 
 apiVersion: cert-manager.io/v1
