@@ -1,103 +1,118 @@
 ServiceAccounts :
-     There are two users in K8s 
-	   1. Normal User
-	   2. ServiceAccounts  
+  There are two users in K8s 
+    1. Normal User
+    2. ServiceAccounts  
 	   
-	ServiceAccounts are comes in picture when an other application wants to connect the cluster for any resource creation
-	or data retrival.
-	Example : An monitoring app will connect to cluster for retrival of metrics data.
-	Before this the request comes to API_Server it will check for Authentication and then performs the action.
+  ServiceAccounts are comes in picture when an other application wants to connect the cluster for any 
+  resource creation or data retrival.
+    Example : An monitoring app will connect to cluster for retrival of metrics data.
+              Before this the request comes to API_Server it will check for Authentication and then performs the action.
 	
-	For Authentication of that specific application we will create an ServiceAccount.
-	For password we use Token to get this describe the pod and see in mounts section.
-	For that app serviceaccount acts as username and for pass we use token.
-
-    For Authorization will create RABC (Role & RoleBindings)
+  For Authentication of that specific application we will create an ServiceAccount.
+  For password we use Token to get this describe the pod and see in mounts section.
+  For this app serviceaccount acts as username and for pass we use token.
+  For Authorization will create RABC (Role & RoleBindings)
 	
-	Steps:
-           1. kubectl create sa mysa      --> ServiceAccount as sa
-           2. kubectl get sa 
-           3. kubectl create token mysa 
-           4. Create Role.yml & Cluser RoleBinding.yml file & apply it
-           5. Create an Pod.yml add add ServiceAccountName field in manifest file. Apply it.
-           6. kubectl auth can-i get pod --as=system:serviceaccount:default:mysa  
-              It will show that the sa has all permission or not which was given by Role & Cluser RoleBinding.
+Steps:
+  1. kubectl create sa mysa      --> ServiceAccount as sa
+  2. kubectl get sa 
+  3. kubectl create token mysa 
+  4. Create Role.yml & Cluser RoleBinding.yml file & apply it
+  5. Create an Pod.yml add ServiceAccountName field in manifest file. Apply it.
+  6. kubectl auth can-i get pod --as=system:serviceaccount:default:mysa  
+     It will show that the sa has all permission or not which was given by Role & Cluser RoleBinding.
+
+To Create ServiceAccount we nedd to create Role & Role Binding.
+  1. Authentication: Username & pass (ServiceAccount & Token)
+  2. Authorization: Access Permission (Role & Role binding that is RABC)
+
+With jwt.io website we can see the token in readabel format.
+
+Steps:
+  1. kubectl create sa mysa
+  2. kubectl create token mysa 
+  3. The token you generated & the one which is created by default is diff. Copy new on to cd /var/run/secrets/kubernetes.io/serviceaccount
+  4. In token file
+  5. create role.yml file & apply it.
+  6. create rolebinding.yml & apply it.
+  7. create a pod/deployment file mention service account name as created.
 
 
-Service Account in Kubernetes Practical Guide:
-    Service Accounts in Kubernetes allow you to authenticate and authorize applications and services running within a cluster. 
-    They provide a way to grant specific permissions and access control to pods and containers.
-
-In this practical, we will cover the following steps:
-
-Creating a Service Account:
-    1. Creating a token for the Service Account
-    2. Creating a Role to define permissions
-    3. Creating a RoleBinding to associate the Role with the Service Account
-    4. Using the Service Account in a Pod
-    5. Verifying access permissions
-    6. Setting Up Your Service Account
-
- To create a Service Account, use the following commands:
-    kubectl create sa mysa
-
- To create a token for the Service Account "mysa" :
-    kubectl create token mysa
-
-  Defining Permissions with Roles:
-    To define permissions for the Service Account, we need to create a Role. Use the following YAML file:
+vi role.yml
 
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  namespace: default
-  name: pod-reader
+   name: my-role
+   labels:
+     name: my-role
 rules:
-- apiGroups:
-  - ''
-  resources:
-  - pods
-  verbs:
-  - get
-  - watch
-  - list
-To associate the Role with the Service Account, create a RoleBinding. Use the following YAML file:
+  - apiGroups:
+     - ''
+    resourceNames:      # If you want to attach this to specific object then give name here
+      -
+    resources:          # By this all objects mentioned here will be used under this
+      - pods               # If used pod then for all pods who uses this will get this.
+    verbs:
+     - get
+     - watch
+     - list     
+# "get", "list", "watch", "create", "update", "patch", "delete" This also can be used.  
+
+vi rolebindings.yml
 
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: read-pods
-  namespace: default
-subjects:
-- kind: ServiceAccount
-  name: mysa
-  namespace: default
+   name: my-rb
+   labels:
+     name: my-rb
 roleRef:
-  kind: Role
-  name: pod-reader
-  apiGroup: rbac.authorization.k8s.io
+    apiGroup: rbac.authorization.k8s.io 
+    kind: Role
+    name: my-role
+subjects: 
+ - apiGroup: rbac.authorization.k8s.io   # Here it is accepting blank data like this '' not this value.
+   kind: ServiceAccount        
+   name: mysa     
+   namespace: default
 
-Putting It All Together: Using Service Accounts in Pods
 
- To use the Service Account in a Pod, update the Pod definition with the appropriate serviceAccountName. Use the following YAML file:
+ # Here in subject if you want to add more users then do following
+  subjects: 
+   - apiGroup: rbac.authorization.k8s.io   
+     kind: User       
+     name: Atul     
+     namespace: default  
+
+# Here if you want to add group having more user then
+  subjects: 
+   - apiGroup: rbac.authorization.k8s.io   
+     kind: Group        
+     name: "Paste link of that group if it is in AWS"     
+     namespace: default          
+
+
+# pod.yml
 
 apiVersion: v1
 kind: Pod
 metadata:
-  name: nginx
+  name: my-pod
+  labels:
+    name: my-pod
 spec:
-  serviceAccountName: mysa
+  serviceAccount: mysa
   containers:
-  - name: nginx
-    image: nginx:1.14.2
-    ports:
-    - containerPort: 80
-Ensuring Access: Verifying Permissions
+    - name: my-conta
+      image: nginx:latest
+      ports:
+        - containerPort: 80
+
 
  To verify the access permissions of the Service Account, use the following command:
-    kubectl auth can-i get pods --as=system:serviceaccount:default:mysa
+  kubectl auth can-i get pods --as=system:serviceaccount:default:mysa
 
  Explanation:
     The command checks if the Service Account "mysa" has permission to get pods.
     The output will indicate whether the access is allowed or denied.
-
