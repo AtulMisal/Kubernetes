@@ -1,0 +1,740 @@
+                                                                              2/11/2023
+Watch Video and My GitHub Repo all docs are there.
+Also on whatsapp Devops material group have some LinkdIn posts see that.
+
+--------------------------------------------------------------------------------------------------------------------------------
+Introduction to Kubernetes & Kubernetes Architecture :
+ • Introduction to Kubernetes :
+     Kubernetes is also knows as k8s because there are 8 characters between k & s. k8s is an container orchastration an management tool. 
+	 "K8S is an open source system for automating deployment, scalling and managment of containerized application". Also called 
+	 container management (orchestration) tool"
+	 
+ • Kubernetes Architecture :
+     K8S nodes are divided into 2 types, master node(control plane), and worker node
+     These nodes can be a physical machines as well as the virtual machines
+     Master and Worker nodes have different components resided inside it.
+	 
+ 
+Explore Kubernetes Architecture (Master & Worker Node Component) :
+  K8S nodes are divided into 2 types, master node(control plane), and worker node.
+    • Master Node (Control Plane) :
+	    1. Master is responsible for managing the complete cluster.
+        2. You can access master node via the CLI, GUI, or API.
+        3. The master watches over the nodes in the cluster and is responsible for the actual orchestration of 
+		   containers on the worker nodes.
+        4. For achieving fault tolerance, there can be more than one master node in the cluster.
+        5. It is the access point from which administrators and other users interact with the cluster.
+        6. It has four components: ETCD, Scheduler, Controller and API Server 
+
+        • Master Node Component :
+	        1. ETCD 
+		    2. Scheduler 
+		    3. Controller 
+		    4. API Server 
+		
+	• Worker Node :
+        Worker node carries pods with them. The main components of worker nodes are
+          1. Kubelet
+          2. kube-proxy		
+	      3. container runtime
+ 
+	
+Minikube Installation
+   Minikube is set up within a single VM and it is very useful if you have limited resources, Minikube is not used for production 
+   environment setup, it is mostly used by the developers or to set up an environment for learning.
+  
+  
+Steps for Kubernetes cluster setup
+   • The machine needs to have 2 CPU processors and all the machines in the cluster should be in the same network so 
+     that they can ping each other.
+   • ssh into all the VMS
+   • In all the node swap memory should be disabled
+
+    01. To check current status use the below command
+           free -h
+  
+    02. To disable swap memory
+           swapoff -a
+  
+    03. Now, make these changes in fstab so after boot, the swap memory will be disabled
+          vi /etc/fstab
+          comment all swap related lines(repeat this process in all the nodes)
+  
+    04. Now install Docker in all the nodes
+  
+    05. Open the k8 document and check which current docker version is supported by the k8s
+  
+    06. Install Kubeadm in all the VMS
+  
+    07. Check the outcome of the below command in all the nodes, it should be different in all the nodes
+          sudo cat /sys/class/dmi/id/product_uuid
+  
+    08. Now use the below commands to install and update necessary packages
+        Update the apt package index and install packages needed to use the Kubernetes apt repository:
+          sudo apt-get update
+          sudo apt-get install -y apt-transport-https ca-certificates curl
+  
+    09. Download the Google Cloud public signing key:
+          sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+  
+    10. Add the Kubernetes apt repository:
+          echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+  
+    11. Update apt package index, install kubelet, kubeadm, and kubectl, and pin their version:
+          sudo apt-get update
+          sudo apt-get install -y kubelet kubeadm kubectl
+          sudo apt-mark hold kubelet kubeadm kubectl
+
+    12. To initialize the control-plane node run(to create master node use below command on any of the nodes)
+          kubeadm init --pod-network-cidr=10.244.0.0/16   //this will be a ip range of pods.
+  
+    13. To start using your cluster, you need to run the following as a regular user:
+          mkdir -p $HOME/.kube
+          sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+          sudo chown $(id -u):$(id -g) $HOME/.kube/config
+  
+    14. To check the installation of master use below command
+          kubectl get nodes
+          You should be able to see one node.
+
+    15. You should now deploy a Pod network to the cluster.with one of the options listed at: 
+          /docs/concepts/cluster-administration/addons/       -- See this doc.
+          Run "kubectl apply -f [podnetwork].yaml"
+ 
+    16. You can now join any number of machines by running the following on each node as root:  
+          kubeadm join <control-plane-host>:<control-plane-port> --token <token> --discovery-token-ca-cert-hash sha256:<hash>
+
+
+init containers:
+  Init containers are exactly like regular containers, except:
+  Init containers always run to completion.
+  Each init container must complete successfully before the next one starts.
+  After init containers runs successfully then other container will starts.
+    
+  Use Cases :
+    1. As init containers start before app containers so if we want to do some work related to DB then we can use this.
+	2. As soon as your pod gets created and you want to register it somewhere.
+	3. In pod's volume you have to clone some code from github.
+	
+	
+Labels and Selectors :
+  Labels are kind of special words given to pods so that we can search them easily.
+  Selectors are also same like labels.
+
+Services:
+  Services are used to expose the app to world.
+  There are 3 types of services
+    1. NodePort :
+	      You can access the service/app outside the cluster
+	2. Cluster IP : 
+	      You can access the service/app within the cluster
+	3. Load Balancer
+	      It will balances the load on app/pod
+	
+Replication Controller :
+   1. What is & Why we need Replication Controller ?
+        ReplicationController represents the configuration of a replication controller.
+		When we need the replicas of a pod we use replication controller which works on equality based selectors.
+		Selectors are nothing but special words with which we can identify the k8s object.
+   
+        A Replication Controller is a object that enables you to easily create multiple pods, then make sure 
+		that that number of pods always exists. If a pod does crash, the Replication Controller replaces it.
+   
+      
+Replica Set :
+  1. Why we need Replica Set ?
+       1. As we know Replica set is the modification of Replication Controller.
+	   2. Replication Controller only works on equality based selectors but Replica set works on both equality based &
+	      set based selectors.
+       3. Replica Controller is deprecated and replaced by ReplicaSets. Deployments are recommended over ReplicaSets.
+	   
+  2. What is the diff between Replication Controller & Replica Set ?  
+       1. The difference between a replica set and a replication controller is that a replica set supports 
+		  set-based selector & equality-based requirements whereas a replication controller only supports 
+		  equality-based selector requirements.
+	   2. The rolling-update command works with Replication Controllers & The rolling-update command won’t work 
+	      with ReplicaSets.	
+	   3. Replica Controller is deprecated and replaced by ReplicaSets. Deployments are recommended over ReplicaSets.	  
+
+Deployment Object in Kubernetes
+
+  Why Deployments Matter :
+      Robust Scaling: Deployments allow for dynamic scaling, ensuring your applications meet varying demand with ease.
+      Effortless Updates: Manage application updates seamlessly, rolling out new versions without downtime.
+      Reliable Rollbacks: If a new version encounters issues, Deployments make it simple to revert to a stable state.
+	  Declarative Configuration: Define the desired state of your application, and let Kubernetes handle the rest.
+
+  Use Cases
+      Deployments are invaluable for:
+	  Scaling Applications: Scale up or down as needed, ensuring your application can handle traffic spikes.
+	  Efficient Updates: Implement rolling updates to keep your applications current and bug-free.
+	  Quick Rollbacks: Swiftly revert to a previous version when issues arise during an update.
+	  Easy Rollout: Gradually replace old Pods with new ones, ensuring a smooth transition. 
+
+
+  1. Why we use Deployment & Why we need that ?
+        A Kubernetes Deployment tells Kubernetes how to create or modify the pods that hold a 
+		containerized application. Deployments can help to efficiently scale the number of replica pods, 
+		enable the rollout of updated code in a controlled manner, or rollback to an earlier deployment 
+		version if necessary.
+		
+		With other object we don't have rollback option so if the new version of app is not stable then we 
+		need to go back to stable one in that case rollback option is necessory.
+		
+		With deployment we can avoid the downtime which comes during rollback as in RS we need to delete current and then create new.
+		In deployments there is also some minimul downtime so we are using some strategy.
+		     1. Recreate Strategy : (Used in Development)
+                  Here all pod from deployment will be deleted and parallay new pod will be generated.		
+				  
+			 2. Rolling Update : (Default Strategy)
+                  Here when we are upgrading the app one pod from one deployment will get deleted and new pod in deployment
+				  will be created.
+						 	
+        In deployment we have two options as maxSurge & maxUnavailable.
+		     1. maxSurge :
+			        With this if you have 10 replicas of your app then it will create 2 more replicas to balance 
+					the condition. Then after rollout is successful then it will delete that two pods.
+			 2. maxUnavailable :
+                    As name indecates while making rollout 2 pods (If you gave value as 2) from previous deployment 
+					will be deleted and two new pods will be created in new deployment			 
+
+            If you not provide maxSurge & maxUnavailable value then by default it will take 25% value for both.
+			miniRedaySeconds it will take zero.
+			
+		Once you made rollout successfully then two replic sets will be created a new one & old one.
+            kubectl get rs
+
+        To check the history of deployment use 
+            kubectl rollout history deploy deployment_name
+
+        Here it will shows the revision status along with no & name but the name it will not take if you want to provide any revision 
+		name then use below data in deploy.yml file
+            kubectl apply -f deploy.yml --record=true 
+            kubectl rollout history deploy deployment_name  
+        
+		Now you can see some data is there in the revision history to provide your own value use
+            kubectl get deploy deployment_name -o yaml | less
+        See the data that are in revision field need to search here
+
+        Now while creating yaml file under annotation add one data as 
+            metadata:
+              annotations:
+			     kubernetes.io/change-cause: Add_Your_Data
+				 
+        How to change the no of revision as from default value.
+            revisionHistoryLimit: 20       In yaml file under spec.		
+	   
+        To move back to previous version/rollout use 
+		    kubectl rollout undo deploy mydeploy --to-revision=1
+			
+	
+Resource Request :
+    1. Why we need Resource Request in K8S ?
+         As we know when a pod is created K8S scheduler will schedule the pod on any available worker node & this pod is able to acquire the whole spec of that worker node. So to avoid this we are using Resource Request.
+         Also if a pod needs more spec to work then according to that request scheduler will schedule the pod.
+		 
+Resource Limit :
+    1. Why we need Resource Limit in K8S ?   
+         As we know when a pod is created K8S scheduler will schedule the pod on any available worker node & this pod is able to acquire the whole spec of that worker node. So to avoid this we are using Resource Request, but still it is able to 
+		 aquire all space as it is requesting the space so with help of limit will set a line for pod, also if the pod crosses the limit again and again then it will be deleted from that node and it's state will change to OOm (Out Of Memory)
+                
+Namespace :
+    1. What is Namespace & why we need it ?
+	     Kubernetes supports multiple virtual clusters backed bu the same physical cluster. These virtual clusters are called Namespace. In another words it's like a folder structure as we store diff docs in diff folder to identify them.
+		 
+	2. When Do You Need Multiple Namespaces ?
+         In a single organization there are multiple projects are running on same cluster also multiple users are working on these so to identify each project and to provide some rules to that specific user we need Namespace in K8S.
+
+
+    With the help of below command we can check that which resource supports Namespace & which not.
+        kubectl api-resources | less 
+
+    With imagePullPolicy: Never the request for this image will not go on internet it will search it in local.
+
+    All namespaces that are provided by k8s are :
+	   kubectl get ns
+	     1. default :
+              Whenever you create any resource in k8s by default it will be created in default namespace.
+			  
+         2. kube-node-lease :
+              All the worker nodes send their heart beats to master controller so that master will ensure that this 
+			  specific worker node is alive & is able to acept the pod to run on them. So to send the heartbeat 
+			  frequently to master-controller kube-node-lease will comes in picture it will take care of this.
+			  
+         3. kube-public :
+		      If you want that some resources are publically (Any other user who has access to the cluster but not 
+			  to specific namespace) available then that will be created in this namespace.
+			  Here we don't wan't to provide any authentication for public to access the resource.
+			  
+         4. kube-system :
+              You can assign this namespace to resources created by the Kubernetes platform itself means all the 
+			  components of k8s architecture can be stored here.        
+   
+    A resource with same name can not be created in same namespace but it can be created in other namespace.   
+
+    To set any namespace as default namespace means whenever we hit kubectl get resource_name then it has to show the resources from that specific namespace then use follo command 
+       kubectl config set-context --current --namespace=Namespace_Name
+	   
+	DNS --> Convert hostname to IP.
+
+    ** To access a service from other namespace use below command :
+         curl service_name.namespace_name.svc.cluster.local         -- Change names accordingly
+		 Here namespace_name is from where the service is created.
+		 
+Resource Quota :
+    In k8s there are two types of resources one is compute based & other is Object based.
+        1. Compute based :
+              Memory, CPU
+        2. Object based :
+              All resources that supported Namespace.
+
+    With the help of this we can set a limit on namespace for any k8s objects that supports Resource Quota.
+      Example: In myns (Created by me) if I want to add only 2 pods then by using Resource Quota I can achive.
+	  
+	By default if you not provide resource request in pod.yml file it will take same values as limits.
+    But in every case you need to provide limit to any resource as in quota we mentioned the limits.
+
+
+Limit Range :
+    1. Why we are using Limit Range & why we need it in k8s ?
+	     A limit range allows you to specify the minimum and maximum CPU and memory limits for all containers 
+		 across a pod in a given project.
+		 Whenever a pod gets created on node it must have some limits on comput based resources like memory & cpu so we 
+		 are using it.
+		 
+	Min & Max :
+      When a pod gets created & while assinging to a node it must need these amount of limit & request/If not these 
+	  given can be set.
+
+    Limits can be applied to multiple resources apart from Container
+       1. Container
+       2. Pod
+       3. Image
+       4. ImageStream
+       5. PersistentVolumeClaim (pvc)
+
+
+Config Map :
+      In Kubernetes, ConfigMap is the dictionary of key-value pairs of strings representing your Pods’ configuration. 
+      A ConfigMap is an API object used to store non-confidential data in key-value pairs.
+	  A ConfigMap allows you to decouple environment-specific configuration from your container images, so that your applications are easily portable.
+
+    There are many ways to use configmap(cm) as --
+       1) By giving direct values 
+           kubectl create cm cm1 --from-litrels=database_ip="192.168.10.0" --from-literals=database_name="Database"
+
+       2) From files 
+           kubectl create cm cm2 --from-files=file.properties 
+
+       3) If multiple files present use directory 
+           kubectl create cm cm3 --from-files=directoryName
+
+       4) From env file is same as from file but here each variable becomes key and values 
+            kubectl create cm cm4 --from-env-files=file.sh     	  
+	
+    Now we can inject these created cm into pod's configuration.
+	   When we inject these cm into pod it can be visible in containers in two ways one is as a file and other is as env.
+	   
+	   1. Injecting into pod as env :
+	        Here we are injecting variables as single value.
+            env:
+             - name: envfromcm
+               valueFrom:
+                 configMapKeyRef:
+                   key: key1              # File Name / Key Name
+                   name: cm1    	
+        -------------------------------------------------------
+       2. Injecting into pod as envfile :
+            Here we are injecting variables as a file.
+              envFrom: 
+               - configMapRef:
+                    name:     # cm name 	
+		---------------------------------------------------------			
+       3. Injecting into pod as file :
+               Here we are injecting cm as file. For this we need to create volume & volume mounts.
+               			   
+       volumeMounts:
+          - name: test  # name of volume
+            mountPath: "/config"    # inside pod where to mount
+            readOnly: true
+
+        volumes:          
+         - name: test
+           configMap:
+             name: #name of configmap
+        ----------------------------------------------------------
+
+Secrets :
+    1. Why we need secrets in K8S ?
+	      In most of the cases while storing data in container we need to secure it so that no one can harm our configuration.
+		  To secure small amount of data (Upto 1 MB only)
+		  
+		Docker-registry secret : to login private doctor registry for pulling image.
+        TLS SECRET : to store certificate and it's associated keys.  
+        Generic : Create a secret from a local file, directory or literal value
+		
+	Secrets can be Injected in two ways :
+      1. As env
+      2. As file  (Same as CM)
+
+
+Taint & Tolerations:
+      Taint can be given to nodes its like a filter.
+      Toleration can be added in pods config. so that it can tolerate the node.	  
+ 
+ 
+Node Selector :
+    By this will tell to node that take thoes pod having same node selector.
+
+
+Volumes (emptyDir/hostPath/PV/PVC) :
+  EmptyDir : Volumes created inside pod but outside the container so if container gets stopped/restarted then the data 
+             that stored in will be always there with container, but if pod gets deleted this will not use.
+
+  HostPath : Volumes created on node but it is useful in single node cluster only. As in multi cluster node the pod 
+             may created in other node.		
+
+  Persistent Volume : This volume is provisioned by administrator.
+                      A Kubernetes persistent volume (PV) is an object that allows pods to access persistent storage on a storage device, 
+					  defined via a Kubernetes StorageClass. Unlike regular volumes, which are transient in nature, PVs are persistent, 
+					  supporting stateful application use cases.
+
+  Persistent Volume Claim : It is a claim for you PV.
+
+  While creating the PV & PVC there are two main concepts 
+      1. access modes :
+           1. ReadWriteOnce : Pod can read/write storage access only once
+           2. ReadOnlyMany  : Many Pod can read the storage.
+           3. ReadWriteMany : Many Pod can read & write the storage.
+
+      2. persistentVolumeClaimPolicy :
+           1. Retain : We want to store this data & Administartor can manually delete this and make the storage availabile.
+           2. Delete : Once PVC & POD gets deleted the storage will also get delete by this policy.
+ 
+   What is StorageClass ?
+	StorageClass provides a way to to attach Persistent Storage dynamically to your application without manual intervention.
+	
+	(https://jhooq.com/how-to-use-persistent-volume-and-persistent-claims-kubernetes/) PV & PVC Yaml Files.
+	
+Job & CronJob :
+	Job : (https://www.youtube.com/watch?v=uJKE0d6Y_yg)
+	   Jobs are nothing but a tasks which runs for completion. It will create 1/2 pods and these pods must be completed to complete the job.
+	   Here there are diff fields that needs to be added in yaml file. See video.
+	
+	CronJob :
+       Cron is an Unix utility with which we can schedule the work.
+       With help of cronjob we will schedule our pod to run on specific time.	
+
+
+Deamon Set : 
+    DaemonSet is a Kubernetes feature that lets you run a Kubernetes pod on all cluster nodes that meet certain criteria. 
+	Every time a new node is added to a cluster, the pod is added to it, and when a node is removed from the cluster, 
+	the pod is removed.	  
+       Example: Kube-Proxy
+       UseCase: 
+	     1. Monitoring (Log Collection daemon)	   
+	     2. Running a cluster storage daemon on every node.
+		 3. Running a node monitoring daemon on every node.
+		 
+	Alwayas run in kube-system namespace.
+
+
+Stateful Set :
+    Stateful set are k8s resource that allow us to deploy and manage stateful applications.
+
+    1. What is Stateful applications ?
+        The application which requiers a persistent storage to function properly are called.
+        Example : Database
+
+    2. What is stateless applications ?
+        The application which did not requiers any persistent storage to work are called. They serve static content on web.
+
+    Deployment VS Statefulset :
+        With help of deployment we can deploy our application on web/server. Which also creates it's replicas but for this application if users wants to upload some data then that data should be stored in the application with help of database. As we have multiple replicas of app so if we install database using deployment then there should be 
+        some consiquences as :
+           Consider 3 replicas of app & database are running		   
+		     1. Now app wants to store some data so with help of service it can be stored on DB-2
+             2. Now app wants to access that data so service randomly sends requests to any DB in deployment by this 
+			    case if request goes to DB-1 or DB-3 then that data is old one.
+        
+		With deployment the DB are not schcronized so data in DB are diff according to wrie operations performed by app. To overcome this issue in k8s we use statefulsets for stateful applications.		 
+		 
+		With statefulset we also create replicas of our application/stateful app. But here while creating the replicas a 
+        unique name is given to each pod by statefulset. If the pod gets delete then also the same name is given to new pod.
+        Here one pod becomes centeral pod on which we perform read/write application and other pods are senchronised with it so once read/write operations are done other pods get senchronised from it.
+
+        In statefulset the pods get created in sequentially.	
+	
+
+Horizontal Pod Autoscaler :
+    K8S has the possibility to automatically scale the pods based on CPU utilization which is called HPA.
+	Scaling can be done for scalable object such as RS,RC,Deployment .
+	The default time period after wich HPA will check the cpu utilization or other parameteres based on given input is 30 sec.
+	
+	
+	1. First you need to install one metrics server which will fetch the required data.
+	      wget -O metricserver.yml https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+    2. By this a yaml file will be downloaded and now we have to add one line coz to avoid certification issue.
+	   In this file go to deployment section and under containers we have multiple args add this line in that kubelet-insecure-tls
+	   & apply this file an in kube-system namespace a pod will get created.
+	3. Then create one deployment file as given in github file.
+	4. Then apply one command as follows :
+	      kubectl autoscale deployment mydeploy --cpu-percent=20 --min=1 --max=10
+    5. By this command an HPA will be created with given specification.
+    
+	
+ServiceAccounts :
+     There are two users in K8s 
+	   1. Normal User
+	   2. ServiceAccounts  
+	   
+	ServiceAccounts are comes in picture when an other application wants to connect the cluster for any resource creation
+	or data retrival.
+	Example : An monitoring app will connect to cluster for retrival of metrics data.
+	Before this the request comes to API_Server it will check for Authentication and then performs the action.
+	
+	For Authentication of that specific application we will create an ServiceAccount.
+	For password we use Token to get this describe the pod and see in mounts section.
+	For that app serviceaccount acts as username and for pass we use token.
+
+    For Authorization will create RABC (Role & RoleBindings)
+	
+	Steps:
+	  1. kubectl create sa mysa      --> ServiceAccount as sa
+      2. kubectl get sa 
+      3. kubectl create token mysa 
+      4. Create Role.yml & Cluser RoleBinding.yml file & apply it
+      5. Create an Pod.yml add add ServiceAccountName field in manifest file. Apply it.
+      6. kubectl auth can-i get pod --as=system:serviceaccount:default:mysa  
+         It will show that the sa has all permission or not which was given by Role & Cluser RoleBinding.
+
+
+Ingress / Egress :
+  1. Ingress :
+      1. Why we are using ingress in k8s ?
+		   The Ingress concept lets you map traffic to different backends based on rules you define via the 
+		   Kubernetes API. An API object that manages external access to the services in a cluster, typically HTTP. 
+		   Ingress may provide load balancing, SSL termination and name-based virtual hosting.
+		   
+		   In simple words it is used to expose the HTTP & HTPPS routes from outside the cluster. 
+    
+	  2. Why we required ingress in k8s ?
+	  
+	  
+	  
+	There are two types :
+	  1. Path based routing :
+	       Here we will route the traffic based on path that we provide in URL.
+	  
+	  2. Host based routing :
+           Here we will route the traffic based on host name that we provide in URL.
+		   
+	  3. SSL Termination :
+           Here the traffic should be routed to HTTPS protocol & Has URL same as Host Based Routing.		   
+ 
+    Steps :
+	  1. Deploy the ingress controller that you want (We used Nginx Controller)
+	  2. kubectl get ns   --> An ingress-nginx namespace will be created 
+	  3. kubectl get all -n ingress-nginx   --> All pods under this will be shown
+	  4. Create the deployment with given docker images (Replicas should be based on condition)
+	  5. Create the services for above deployments with given ports.
+	  6. Create an ingress yml file with all data & apply it.
+	  7. Now describe the ingress controller and see the domains.
+	  8. Open browser and check wether the sits are running or not.
+	  9. Here the protocol is HTTP which is not secure to use HTTPS we need to use SSL Termination.
+	  
+	
+    SSL Termination :
+      1. To run our website on secure side (HTTPS) we need some certificate & to get that we use SSL Termination.
+      2. Need to install a cert-manager
+      3. kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.7.1/cert-manager.yaml
+      4. A namespace should be created cert-manager.
+      5. To create an ssl certificate we have to create issuers & clusterissuers for staging and prod.
+      6. Issuers & ClusterIssuers are the K8S resources that represents certificate autorities that are able to 
+	     generate signed certificates.	
+      7. Create the yml files as in github repo for staging & prod add necessory annotations.
+      8. Edit the ingress file according to condition and check on browser the site will run on HTTPS protocol.
+	  
+
+Livness & radiness :
+
+
+
+
+Role/Cluster Role/ Role Bindings/ Cluster Role Bindings  -- Comes under RABC :
+
+
+
+		 
+Setup Kubernetes Master and Worker Nodes Using Kubeadm
+
+
+
+
+
+
+
+
+
+
+-------------------------------------------------------------------------------------------------------------------------------
+Interview Question:
+ 
+  1. Need for Container Management Platform & Why Kubernetes ?	
+       In organization we run applications on docker container but due to heavy load it may crash or went down and the 
+	   app will goes down and is not a good thing so to avoid this process we use Container Management Platform.
+    	   
+	   Why Kubernetes ?
+	     Kubernetes services provide load balancing and container management on multiple hosts. They make 
+		 it easy for an enterprise's apps to have greater scalability and be flexible, portable and more productive.
+	   
+  2. What is monolethic & microservices app ?
+
+  
+  3. Why we need Load Balancing ? & What is Blue-Green Deployment ? 
+  
+  
+  4. Why we use K8S as we have Docker ?
+  
+  
+  5. What is Self Healing, Auto Scaling & Enterprise App ?
+       • Self-healing of containers (which consists of auto-placement, auto-restart, auto-replication, and scaling of
+     	  containers on the basis of CPU usage).
+	   •
+
+       •	   
+  
+  6. What is Kubernetes ?
+        Kubernetes is an open source platform that automates Container deployment and management.It is mainly used 
+		to automate the deployment, scaling, and operations of the container-based applications across the cluster of nodes.
+        operations :
+           • Eliminates manual activities in deploying and scaling containerized applications
+           • By clustering groups of container engines, Kubernetes deploys and manages the containers efficiently
+           • Clusters can be hosted in public, private or hybrid clouds and possible to run poly-cloud environment as well.
+		   
+  7. What are the K8S Objects ?
+           ♦ Objects represent the state of a cluster
+           ♦ It’s used to set desired state of a cluster
+           ♦ Kubernetes API is used to create, modify or delete an object
+           ♦ Each object has two main fields in its configuration: spec and status
+           ♦ Spec describes the desired state of the object and is set by the user
+           ♦ Status describes state of the object. It is provided and updated by Kubernetes.
+
+  8. Service Discovery and Types
+        Service Discovery - Two primary modes of finding a Service:
+          • Environment variables - Every active Service will have a set of environment variables
+          • DNS - DNS server creates a set of DNS records for each new Service
+        Service Types - When an application needs to be exposed as Service there are three different
+        service type
+          1.ClusterIP: Exposes Service on cluster’s IP address. It will be reachable from within the cluster
+          2.NodePort: Exposes Service on each Node’s IP on a static port. It is accessible from outside the cluster
+          3.LoadBalancer: Exposes Service externally using cloud provider’s load balancer
+		  
+  9. Need of Ingress Controller
+       • Service Type LoadBalancer utilizes Cloud service provider load balancer resource.
+           e.g : AWS ELB will be created when service type is configured as LoadBalancer.
+       • Load balancer is configured to distribute traffic to the pods in your Service on a given port.
+       • LoadBalancer service only works at layer 4
+       • Service is unaware of the actual applications
+       • Can't make any additional routing considerations.
+         Ingress controllers works on layer 7, and may use more intelligent rules to distribute application traffic
+		 
+ 10. Ingress Controller in Kuberntes
+       • In Kubernetes, We cab deploy 3rd party Ingress controllers like NGINX, Traefik, HA-Proxy etc.
+       • We can leverage Cloud service provider Layer 7 Load balancer as ingress controller i.e AWS and Azure
+         Application Load balancers.
+       • By enabling HTTP application routing in a Kubernetes cluster, we can utilize the Ingress controller and an
+         External- DNS controller.
+       • When an ingress resources are created , DNS A records are created in a cluster-specific DNS zone.
+           e.g. : In our hands on lab setup, we have deployed a Traefik ingress controller to route the traffic and
+                  Leveraged the Route 53 for external DNS A record		
+
+ 11. Storage Classes
+        StorageClass provides how for administrators to explain the “classes” of storage they provide . Different 
+		classes might map to quality-of-service levels, or to backup policies, or to arbitrary policies determined by the
+        cluster administrators.
+          • A Persistent Volume are often statically created by a cluster administrator, or dynamically created by the
+     		Kubernetes API server.
+          • Storage class helps to determine the type of backend storage to be selected when cluster is hosted in Cloud 
+    		platform.
+          • Popular Cloud service platforms and corresponding class names
+          • Azure – Managed and Un managed, Premium , standard and Slow disks
+          • AWS – Too many EBS offerings . Default is gp2 and others are io1, gp2, sc1, st1
+          • GCP - pd-standard or pd-ssd (Standard and SSD disks)
+          • StorageClass also defines the reclaim Policy which helps to retain the data despite of deleting/ destroying 
+		    the application.				  
+		  
+ 12. What is mean by Orchestration/Management tool?
+        Container orchestration automates the deployment, management, scaling, and networking of containers across 
+		the cluster. As we know docker is used to create containers but to manage them we use k8s.
+        Kubernetes is a popular container orchestration tool similar to docker swarm, K8 is mostly used to manage the containers, it is also used for blue-green deployments, also use to scale the containers. Written in Golang.
+
+ 13. Container orchestration is used to automate the following tasks at scale:
+        • Configuring and scheduling of containers
+        • Provisioning and deployment of containers
+	    • Redundancy and availability of containers
+		• Scaling up or removing containers to spread application load evenly across host infrastructure
+		• Movement of containers from one host to another if there is a shortage of resources in a host, or if a host dies
+		• Allocation of resources between containers
+		• External exposure of services running in a container with the outside world
+		• Load balancing of service discovery between containers
+		• Health monitoring of containers and hosts		
+		   
+ 14. What is Kubectl ?
+        kubectl is the command line utility using which we can interact with k8s cluster
+        Uses APIs provided by API server to interact.
+        Also known as the kube command line tool or kubectl or kube control.
+        Used to deploy and manage applications on a Kubernetes		   
+		
+ 15. K8S dashboard vulnerabilities ?
+ 
+ 16. What is the diff between kubectl create & kubectl apply command ?
+       K8S supports both imperative, imperative object config & declarative object config commands.
+	     • Imperative :
+               When you create any resource without creating yml files then it can be termed as Imperative type config.
+         • Imperative object config :
+               kubectl create command can be termed as Imperative object config.
+               kubectl create command can only be used when the resource does not already exist.
+         • Declerative object config :
+               kubectl apply command can be termed as Declerative object config.	
+               This cammand can be used to create/change the already existing resource.
+               This command also usese --server-dry-run option which is not there in othe commands.			   
+ 
+ 17. What is kubconfig file & Why we need that ?
+      The kubeconfig file is a YAML file containing groups of clusters, users, and context. It is used to organize information about clusters, users, namespaces. The kubectl command-line tool uses kubeconfig files to find the information it needs to choose a cluster and communicate with the API server of a cluster. The default location of the kubeconfig file is /etc/kubernetes/admin.conf. You can specify other kubeconfig files by setting the KUBECONFIG environment variable or by setting the --kubeconfig flag 
+ 
+ 18. What are Sidecar Containers ?
+        Sidecar containers are the containers that should run along with the main container in the pod. This sidecar pattern extends functionality of current containers without changing it.
+		
+	    Imagine that you have the pod with a single container working very well and you want to add some functionality to the current container without touching or changing, how can you add the additional functionality or extending the current functionality? This sidecar container pattern really helps exactly in that situation.
+ 
+ 19. How to create multi master multi node cluster ?
+  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ All Commands that I have used :
+   kubectl get pods
+   kubectl explain pod | less
+   kubectl describe pod pod_name
+   kubectl get pods -o wide
+   kubectl get pods -o yaml
+   kubectl delete resource resource_name  (First container will be deleted and then pod)
+   kubectl get pod pod_name --show-labels
+   kubectl label pod pod_name env=testing
+   kubectl label --overwrite pod pod_name env=dev 
+   kubectl label pod pod_name env-   (It will delete the label)
+   kubectl label pod --all env=testing  (For all pod same label will be attached)
+   kubectl diff -f pod.yml  (Will show the changes if any)
+   kubectl exec pod_name -c container_name env 
+   kubectl exec -it pod_name --bash
+   kubectl exec -it -c myconta mypod -- bash  (If multi container pod)
+   kubectl expose pod pod_name --port=searching_port(On google along with ip use this)  --target-port=pod's_port  --name=mysvc
+   kubectl expose pod pod_name --type=NodePort --port=searching_port --target-port=pod's_port --name=mysvc
+   kubectl describe svc svc_name  // Check which pods have assinged to this svc 
+   kubectl cluster-info
